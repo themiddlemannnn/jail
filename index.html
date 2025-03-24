@@ -3,1092 +3,1509 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>REACTr</title>
+    <title>REACTR - Earn From Reactions</title>
+    <meta name="description" content="Monetize your social media content through reactions with REACTR">
     <style>
         :root {
-            --primary-blue: #1877F2;
-            --secondary-blue: #4267B2;
-            --light-blue: #E7F3FF;
-            --dark-blue: #0E5FCD;
-            --accent-blue: #00B0FF;
-            --text-color: #1C1E21;
-            --light-gray: #F0F2F5;
-            --medium-gray: #CCD0D5;
-            --dark-gray: #65676B;
+            --primary-blue: #0066ff;
+            --dark-blue: #0047b3;
+            --light-blue: #e6f0ff;
+            --accent-green: #00c853;
+            --accent-red: #ff3d00;
+            --bg-color: #f8faff;
+            --text-dark: #1a1a1a;
+            --text-light: #7a7a7a;
+            --white: #ffffff;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --post-radius: 16px;
+            --transition: all 0.3s ease;
+            /* Dark mode variables */
+            --dark-bg: #121212;
+            --dark-card: #1e1e1e;
+            --dark-text: #f0f0f0;
+            --dark-border: #333;
         }
-
+        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
         }
-
+        
         body {
-            background-color: #fafafa;
-            color: var(--text-color);
-            line-height: 1.5;
-        }
-
-        .app-container {
-            max-width: 480px;
-            margin: 0 auto;
-            background-color: white;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
             height: 100vh;
-            overflow-y: auto;
-            position: relative;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
         }
 
+        body.dark-mode {
+            background-color: var(--dark-bg);
+            color: var(--dark-text);
+        }
+        
+        /* Header Styles */
         .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: var(--white);
+            color: var(--primary-blue);
+            padding: 16px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 16px;
-            background: linear-gradient(to right, var(--primary-blue), var(--accent-blue));
-            position: sticky;
-            top: 0;
             z-index: 100;
-            color: white;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            transition: var(--transition);
         }
 
-        .header-left, .header-right {
+        .dark-mode .header {
+            background-color: var(--dark-card);
+            border-bottom: 1px solid var(--dark-border);
+        }
+        
+        .app-name {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--primary-blue), var(--dark-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .wallet-container {
             display: flex;
             align-items: center;
+            gap: 15px;
         }
-
-        .header-left i {
-            font-size: 24px;
-            margin-right: 24px;
-            color: white;
-        }
-
-        .logo {
-            font-size: 26px;
-            font-weight: 700;
-            color: white;
-            letter-spacing: -1px;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-        }
-
-        .balance-display {
-            background-color: rgba(255,255,255,0.2);
+        
+        .wallet-balance {
+            background-color: var(--light-blue);
             padding: 6px 12px;
             border-radius: 20px;
-            margin-right: 16px;
-            font-weight: bold;
-            font-size: 15px;
-            color: white;
+            font-weight: 600;
+            font-size: 14px;
             display: flex;
             align-items: center;
-            cursor: pointer;
+            transition: var(--transition);
         }
 
-        .balance-display i {
-            margin-right: 6px;
+        .dark-mode .wallet-balance {
+            background-color: rgba(0, 102, 255, 0.2);
+        }
+        
+        .wallet-icon {
+            color: var(--accent-green);
+            margin-right: 5px;
+            font-size: 16px;
+        }
+        
+        .add-funds {
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 6px 12px;
+            font-weight: 600;
             font-size: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .add-funds:hover, .add-funds:focus {
+            background-color: var(--dark-blue);
+            transform: scale(1.05);
+            outline: none;
         }
 
-        .profile-pic {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            overflow: hidden;
-            border: 2px solid white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        .dark-mode .add-funds {
+            box-shadow: 0 2px 8px rgba(0, 102, 255, 0.3);
         }
-
-        .profile-pic img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
+        
+        /* Feed Styles */
         .feed {
-            padding-bottom: 70px;
+            margin-top: 70px;
+            margin-bottom: 70px;
+            width: 100%;
+            overflow-y: auto;
+            flex-grow: 1;
+            padding: 0 12px;
         }
-
+        
         .post {
-            border-bottom: 1px solid var(--light-gray);
-            margin-bottom: 16px;
-            background-color: white;
+            background-color: var(--white);
+            border-radius: var(--post-radius);
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: var(--transition);
         }
 
+        .dark-mode .post {
+            background-color: var(--dark-card);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .post:active {
+            transform: scale(0.98);
+        }
+        
         .post-header {
             display: flex;
             align-items: center;
-            padding: 12px 16px;
+            padding: 14px 16px;
         }
-
+        
         .post-user-pic {
-            width: 42px;
-            height: 42px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
-            overflow: hidden;
-            margin-right: 12px;
-            border: 2px solid var(--primary-blue);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .post-user-pic img {
-            width: 100%;
-            height: 100%;
             object-fit: cover;
+            margin-right: 12px;
+            border: 2px solid var(--light-blue);
         }
-
+        
         .post-user-info {
-            flex: 1;
+            flex-grow: 1;
         }
-
+        
         .post-username {
             font-weight: 600;
-            font-size: 15px;
-            color: var(--primary-blue);
+            font-size: 14px;
+            margin-bottom: 2px;
         }
 
+        .dark-mode .post-username {
+            color: var(--dark-text);
+        }
+        
         .post-time {
-            color: var(--dark-gray);
-            font-size: 13px;
+            font-size: 12px;
+            color: var(--text-light);
+        }
+        
+        .post-earnings {
+            background-color: var(--light-blue);
+            color: var(--primary-blue);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            transition: var(--transition);
         }
 
-        .post-content {
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        .dark-mode .post-earnings {
+            background-color: rgba(0, 102, 255, 0.2);
         }
-
+        
         .post-media {
             width: 100%;
-            max-height: 500px;
+            position: relative;
+        }
+        
+        .post-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            aspect-ratio: 1/1;
             object-fit: cover;
+            background-color: #f0f0f0;
         }
 
+        .dark-mode .post-image {
+            opacity: 0.9;
+        }
+        
         .video-container {
             position: relative;
             width: 100%;
-            height: 0;
-            padding-bottom: 100%; /* 1:1 Aspect Ratio */
+            background-color: #000;
         }
-
-        .video-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
+        
+        .video-thumbnail {
             width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.2);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
+            display: block;
+            aspect-ratio: 16/9;
+            object-fit: cover;
         }
-
+        
         .play-button {
-            width: 70px;
-            height: 70px;
-            background-color: rgba(24, 119, 242, 0.8);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background-color: rgba(0, 0, 0, 0.5);
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            transition: transform 0.2s;
-        }
-
-        .play-button i {
-            color: white;
-            font-size: 30px;
-            margin-left: 5px; /* Adjust for play icon centering */
-        }
-
-        .video-thumbnail {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .post-actions {
-            display: flex;
-            justify-content: space-between;
-            padding: 14px 16px;
-            background-color: #fafafa;
-            border-bottom: 1px solid var(--light-gray);
-        }
-
-        .post-actions-left {
-            display: flex;
-            align-items: center;
-        }
-
-        .action-button {
-            display: flex;
-            align-items: center;
-            margin-right: 24px;
-            color: var(--dark-blue);
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: var(--transition);
+            border: none;
+        }
+        
+        .play-button:hover, .play-button:focus {
+            background-color: rgba(0, 102, 255, 0.7);
+            transform: translate(-50%, -50%) scale(1.1);
+            outline: none;
+        }
+        
+        .play-icon {
+            color: white;
+            font-size: 24px;
+            margin-left: 3px;
+        }
+        
+        .post-actions {
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
         }
 
-        .action-button i {
-            font-size: 22px;
-            margin-right: 6px;
+        .dark-mode .post-actions {
+            border-bottom: 1px solid var(--dark-border);
+        }
+        
+        .action-icon-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            margin-right: 20px;
+        }
+        
+        .action-icon {
+            font-size: 26px;
+            cursor: pointer;
+            color: var(--text-dark);
+            transition: var(--transition);
+            position: relative;
+            background: none;
+            border: none;
+            padding: 5px;
         }
 
-        .action-count {
-            font-size: 14px;
-            font-weight: 600;
+        .dark-mode .action-icon {
+            color: var(--dark-text);
+        }
+        
+        .action-icon:hover, .action-icon:focus {
+            transform: scale(1.1);
+            outline: none;
+        }
+        
+        .action-icon.like:hover, .action-icon.like:focus {
+            color: var(--accent-red);
+        }
+        
+        .action-icon.comment:hover, .action-icon.comment:focus {
+            color: var(--primary-blue);
+        }
+        
+        .action-icon.active {
+            color: var(--accent-red);
+            font-weight: 900;
+        }
+        
+        .action-cost {
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            font-weight: bold;
+            color: var(--accent-red);
+            background-color: var(--light-blue);
+            padding: 2px 4px;
+            border-radius: 4px;
+            pointer-events: none;
         }
 
-        .like-info {
-            font-size: 12px;
-            color: var(--dark-gray);
-            margin-left: 6px;
+        .dark-mode .action-cost {
+            background-color: rgba(0, 102, 255, 0.2);
         }
-
-        .post-caption {
+        
+        .post-stats {
             padding: 12px 16px;
             font-size: 14px;
-            line-height: 1.5;
-            border-radius: 0 0 8px 8px;
+        }
+        
+        .post-likes {
+            font-weight: 600;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
         }
 
-        .caption-text {
+        .dark-mode .post-likes {
+            color: var(--dark-text);
+        }
+        
+        .likes-count {
+            margin-left: 5px;
+        }
+        
+        .post-earned {
+            color: var(--accent-green);
+            font-weight: 600;
+            font-size: 13px;
             margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .post-caption {
+            margin-bottom: 8px;
+            line-height: 1.4;
         }
 
-        .hashtags {
+        .dark-mode .post-caption {
+            color: var(--dark-text);
+        }
+        
+        .post-caption-username {
+            font-weight: 600;
+            margin-right: 5px;
+        }
+        
+        .post-comments {
+            color: var(--text-light);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .post-comments:hover {
             color: var(--primary-blue);
-            font-weight: 500;
         }
 
+        .dark-mode .post-comments {
+            color: #aaa;
+        }
+
+        .dark-mode .post-comments:hover {
+            color: var(--primary-blue);
+        }
+        
+        /* Bottom Navigation */
         .bottom-nav {
             position: fixed;
             bottom: 0;
-            left: 0;
-            right: 0;
-            max-width: 480px;
-            margin: 0 auto;
+            width: 100%;
+            background-color: var(--white);
             display: flex;
             justify-content: space-between;
-            background-color: white;
-            padding: 15px 30px;
-            border-top: 1px solid var(--light-gray);
+            padding: 14px 24px;
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
             z-index: 100;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            transition: var(--transition);
         }
 
-        .menu-button, .message-button {
-            background-color: var(--primary-blue);
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 4px 10px rgba(24, 119, 242, 0.4);
-            transition: transform 0.2s, background-color 0.2s;
+        .dark-mode .bottom-nav {
+            background-color: var(--dark-card);
+            border-top: 1px solid var(--dark-border);
+        }
+        
+        .nav-icon {
+            font-size: 26px;
+            color: var(--text-dark);
+            cursor: pointer;
+            position: relative;
+            transition: var(--transition);
+            background: none;
+            border: none;
         }
 
-        .menu-button i, .message-button i {
-            color: white;
-            font-size: 22px;
+        .dark-mode .nav-icon {
+            color: var(--dark-text);
         }
 
-        .menu-button:active, .message-button:active {
-            transform: scale(0.95);
-            background-color: var(--dark-blue);
+        .nav-icon:hover, .nav-icon:focus {
+            color: var(--primary-blue);
+            transform: scale(1.1);
+            outline: none;
         }
-
+        
         .message-badge {
             position: absolute;
             top: -5px;
             right: -5px;
-            background-color: #FF3B30;
+            background-color: var(--accent-red);
             color: white;
             border-radius: 50%;
-            width: 22px;
-            height: 22px;
+            width: 18px;
+            height: 18px;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 12px;
+            font-size: 10px;
             font-weight: bold;
         }
-
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        
+        .hamburger-menu {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            cursor: pointer;
+            gap: 4px;
+            padding: 5px;
+            background: none;
+            border: none;
+        }
+        
+        .hamburger-line {
+            width: 22px;
+            height: 2px;
+            background-color: var(--text-dark);
+            transition: var(--transition);
         }
 
-        .post {
-            animation: fadeIn 0.3s ease-in-out;
+        .dark-mode .hamburger-line {
+            background-color: var(--dark-text);
+        }
+        
+        .hamburger-menu:hover .hamburger-line, 
+        .hamburger-menu:focus .hamburger-line {
+            background-color: var(--primary-blue);
+        }
+        
+        .hamburger-menu:hover .hamburger-line:nth-child(1),
+        .hamburger-menu:focus .hamburger-line:nth-child(1) {
+            transform: translateY(2px);
+        }
+        
+        .hamburger-menu:hover .hamburger-line:nth-child(3),
+        .hamburger-menu:focus .hamburger-line:nth-child(3) {
+            transform: translateY(-2px);
         }
 
-        .action-button:hover {
+        /* Dark mode toggle */
+        .dark-mode-toggle {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--primary-blue);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 100;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            border: none;
+            transition: var(--transition);
+        }
+
+        .dark-mode-toggle:hover {
             transform: scale(1.1);
+            background-color: var(--dark-blue);
         }
 
-        .message-button-container {
+        .dark-mode-toggle i {
+            font-size: 20px;
+        }
+        
+        /* Modal for video */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            width: 100%;
+            max-width: 800px;
+            position: relative;
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: -50px;
+            right: 0;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+            background: none;
+            border: none;
+        }
+        
+        .close-modal:hover, .close-modal:focus {
+            opacity: 1;
+            outline: none;
+        }
+        
+        #video-player {
+            width: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        /* Animation for like */
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-30px) scale(1.5);
+                opacity: 0;
+            }
+        }
+        
+        .coin-animation {
+            position: absolute;
+            pointer-events: none;
+            animation: floatUp 0.8s forwards;
+            color: gold;
+            font-size: 24px;
+        }
+
+        /* Loading skeleton */
+        .skeleton {
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
             position: relative;
         }
 
-        /* Cost explanation tooltip */
-        .like-tooltip {
-            position: absolute;
-            background-color: rgba(0,0,0,0.8);
-            color: white;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            bottom: 40px;
-            left: 0;
-            width: 150px;
-            display: none;
-            z-index: 200;
+        .dark-mode .skeleton {
+            background-color: #333;
         }
 
-        .like-tooltip::after {
+        .skeleton::after {
             content: '';
             position: absolute;
-            bottom: -5px;
-            left: 20px;
-            width: 10px;
-            height: 10px;
-            background-color: rgba(0,0,0,0.8);
-            transform: rotate(45deg);
-        }
-
-        /* Modal Styles */
-        .modal-overlay {
-            position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: rgba(0, 0, 0, 0.6);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 999;
-            backdrop-filter: blur(5px);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shimmer 1.5s infinite;
         }
 
-        .modal {
-            background-color: white;
-            width: 90%;
-            max-width: 400px;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-            animation: modalIn 0.3s ease-out;
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
 
-        @keyframes modalIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .modal-header {
-            padding: 16px;
-            background-color: var(--primary-blue);
-            color: white;
-            font-weight: bold;
-            font-size: 18px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .modal-close {
-            cursor: pointer;
-            font-size: 24px;
-        }
-
-        .modal-body {
-            padding: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
+        .skeleton-text {
+            height: 12px;
             margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--text-color);
+            border-radius: 4px;
         }
 
-        .form-input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid var(--medium-gray);
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.2s;
-        }
-
-        .form-input:focus {
-            border-color: var(--primary-blue);
-            outline: none;
-        }
-
-        .form-button {
-            background-color: var(--primary-blue);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 14px 0;
-            font-size: 16px;
-            font-weight: 600;
-            width: 100%;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .form-button:hover {
-            background-color: var(--dark-blue);
-        }
-
-        .form-button:active {
-            transform: scale(0.98);
-        }
-
-        .bank-info {
-            background-color: var(--light-blue);
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            margin-bottom: 20px;
-        }
-
-        .bank-info-title {
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: var(--dark-blue);
-        }
-
-        /* Comments Section */
-        .comments-section {
-            background-color: white;
-            display: none;
-            padding: 16px;
-            border-top: 1px solid var(--light-gray);
-        }
-
-        .comment {
-            display: flex;
-            margin-bottom: 16px;
-            animation: fadeIn 0.3s ease-out;
-        }
-
-        .comment-avatar {
+        .skeleton-circle {
             width: 36px;
             height: 36px;
             border-radius: 50%;
-            margin-right: 12px;
-            border: 1px solid var(--light-gray);
-            overflow: hidden;
         }
 
-        .comment-avatar img {
+        /* Payment confirmation */
+        .payment-confirmation {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--accent-green);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            box-shadow: var(--shadow);
+            z-index: 150;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+        }
+        
+        /* Insufficient funds modal */
+        .insufficient-funds {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 300;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .funds-modal-content {
+            background-color: var(--white);
+            padding: 24px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            transition: var(--transition);
         }
 
-        .comment-content {
-            flex: 1;
-            background-color: var(--light-gray);
-            padding: 10px 14px;
-            border-radius: 18px;
-            font-size: 14px;
+        .dark-mode .funds-modal-content {
+            background-color: var(--dark-card);
+        }
+        
+        .funds-modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--accent-red);
+        }
+        
+        .funds-modal-text {
+            margin-bottom: 20px;
+            line-height: 1.5;
         }
 
-        .comment-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 4px;
+        .dark-mode .funds-modal-text {
+            color: var(--dark-text);
         }
-
-        .comment-username {
+        
+        .modal-button {
+            padding: 10px 20px;
+            border-radius: 8px;
             font-weight: 600;
-            color: var(--primary-blue);
+            cursor: pointer;
+            transition: var(--transition);
         }
-
-        .comment-time {
-            font-size: 12px;
-            color: var(--dark-gray);
-        }
-
-        .comment-text {
-            line-height: 1.4;
-        }
-
-        .comment-input-container {
-            display: flex;
-            padding: 12px 0;
-            border-top: 1px solid var(--light-gray);
-            margin-top: 10px;
-        }
-
-        .comment-input {
-            flex: 1;
-            padding: 10px 16px;
-            border: 1px solid var(--medium-gray);
-            border-radius: 20px;
-            font-size: 14px;
-            margin-right: 10px;
-        }
-
-        .comment-input:focus {
-            outline: none;
-            border-color: var(--primary-blue);
-        }
-
-        .comment-submit {
+        
+        .add-funds-button {
             background-color: var(--primary-blue);
             color: white;
             border: none;
-            border-radius: 20px;
-            padding: 10px 16px;
-            font-weight: 600;
+            margin-right: 10px;
+        }
+        
+        .add-funds-button:hover, .add-funds-button:focus {
+            background-color: var(--dark-blue);
+            outline: none;
+        }
+        
+        .cancel-button {
+            background-color: transparent;
+            border: 1px solid var(--text-light);
+            color: var(--text-dark);
+        }
+
+        .dark-mode .cancel-button {
+            color: var(--dark-text);
+            border-color: var(--dark-border);
+        }
+        
+        .cancel-button:hover, .cancel-button:focus {
+            background-color: #f0f0f0;
+            outline: none;
+        }
+
+        .dark-mode .cancel-button:hover, 
+        .dark-mode .cancel-button:focus {
+            background-color: #333;
+        }
+
+        /* Add funds modal */
+        .add-funds-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 300;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .funds-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .fund-option {
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
             cursor: pointer;
+            transition: var(--transition);
         }
 
-        .comment-submit:disabled {
-            background-color: var(--medium-gray);
-            cursor: not-allowed;
+        .dark-mode .fund-option {
+            border-color: var(--dark-border);
         }
 
-        .comments-header {
+        .fund-option:hover, .fund-option:focus {
+            border-color: var(--primary-blue);
+            transform: scale(1.02);
+            outline: none;
+        }
+
+        .fund-option.selected {
+            border-color: var(--primary-blue);
+            background-color: var(--light-blue);
+        }
+
+        .dark-mode .fund-option.selected {
+            background-color: rgba(0, 102, 255, 0.2);
+        }
+
+        .fund-amount {
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .fund-bonus {
+            color: var(--accent-green);
+            font-size: 12px;
+        }
+
+        /* Transaction history */
+        .transactions-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--white);
+            z-index: 400;
+            flex-direction: column;
+            transition: var(--transition);
+        }
+
+        .dark-mode .transactions-container {
+            background-color: var(--dark-bg);
+        }
+
+        .transactions-header {
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .dark-mode .transactions-header {
+            border-bottom: 1px solid var(--dark-border);
+        }
+
+        .transactions-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .dark-mode .transactions-title {
+            color: var(--dark-text);
+        }
+
+        .close-transactions {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-dark);
+        }
+
+        .dark-mode .close-transactions {
+            color: var(--dark-text);
+        }
+
+        .transactions-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .transaction-item {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
         }
 
-        .comments-title {
+        .dark-mode .transaction-item {
+            border-bottom: 1px solid var(--dark-border);
+        }
+
+        .transaction-details {
+            flex: 1;
+        }
+
+        .transaction-amount {
             font-weight: 600;
-            font-size: 16px;
         }
 
-        .comments-close {
-            font-size: 18px;
-            color: var(--dark-gray);
-            cursor: pointer;
+        .transaction-amount.positive {
+            color: var(--accent-green);
+        }
+
+        .transaction-amount.negative {
+            color: var(--accent-red);
+        }
+
+        .transaction-description {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-top: 4px;
+        }
+
+        .dark-mode .transaction-description {
+            color: #aaa;
+        }
+
+        .transaction-time {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        .dark-mode .transaction-time {
+            color: #aaa;
+        }
+
+        /* Focus styles for accessibility */
+        button:focus, [tabindex="0"]:focus {
+            outline: 2px solid var(--primary-blue);
+            outline-offset: 2px;
+        }
+
+        /* Loading overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 500;
+            display: none;
+        }
+
+        .dark-mode .loading-overlay {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--light-blue);
+            border-top: 5px solid var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="app-container">
-        <div class="header">
-            <div class="header-left">
-                <i class="fas fa-home"></i>
-                <i class="fas fa-search"></i>
-            </div>
-            <div class="logo">REACTr</div>
-            <div class="header-right">
-                <div class="balance-display" id="wallet-button">
-                    <i class="fas fa-wallet"></i>
-                    <span id="balance-amount">N120k</span>
-                </div>
-                <div class="profile-pic">
-                    <img src="profile.jpeg" alt="Profile Picture">
-                </div>
+    <!-- Loading overlay -->
+    <div class="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="app-name">REACTR</div>
+        <div class="wallet-container">
+            <button class="add-funds" aria-label="Add funds to wallet" onclick="showAddFundsModal()">
+                <i class="fas fa-plus"></i> Add Funds
+            </button>
+            <div class="wallet-balance" role="button" tabindex="0" onclick="showTransactions()" aria-label="Wallet balance and transaction history">
+                <i class="fas fa-wallet wallet-icon"></i>
+                <span id="user-balance">N120,450</span>
             </div>
         </div>
+    </header>
+    
+    <!-- Feed -->
+    <div class="feed" id="feed">
+        <!-- Posts will be loaded here -->
+    </div>
+    
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <button class="hamburger-menu" aria-label="Menu" onclick="toggleMenu()">
+            <div class="hamburger-line"></div>
+            <div class="hamburger-line"></div>
+            <div class="hamburger-line"></div>
+        </button>
+        <button class="nav-icon" aria-label="Messages">
+            <i class="far fa-paper-plane"></i>
+            <span class="message-badge">3</span>
+        </button>
+    </nav>
 
-        <div class="feed">
-            <!-- Video Post -->
-            <div class="post">
-                <div class="post-header">
-                    <div class="post-user-pic">
-                        <img src="profile.jpeg" alt="User Profile">
-                    </div>
-                    <div class="post-user-info">
-                        <div class="post-username">Baba_Tee</div>
-                        <div class="post-time">2 hours ago</div>
-                    </div>
-                </div>
-                <div class="post-content">
-                    <div class="video-container">
-                        <img class="video-thumbnail" src="nollywood.jpg" alt="Video Thumbnail">
-                        <div class="video-overlay">
-                            <div class="play-button">
-                                <i class="fas fa-play"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="post-actions">
-                    <div class="post-actions-left">
-                        <div class="action-button like-button">
-                            <i class="far fa-heart"></i>
-                            <span class="action-count">1.2k</span>
-                            <span class="like-info">(N1.2k Nubis)</span>
-                            <div class="like-tooltip">Costs N1 to like this post</div>
-                        </div>
-                        <div class="action-button comment-button">
-                            <i class="far fa-comment"></i>
-                            <span class="action-count">348</span>
-                        </div>
-                        <div class="action-button">
-                            <i class="far fa-share-square"></i>
-                            <span class="action-count">56</span>
-                        </div>
-                    </div>
-                    <div class="action-button">
-                        <i class="far fa-bookmark"></i>
-                    </div>
-                </div>
-                <div class="post-caption">
-                    <div class="caption-text">
-                        Alaagba (Showing now)
-                    </div>
-                    <div class="hashtags">#Nollywood #Alaagba #YorubaFilms</div>
-                </div>
-
-                <!-- Comments Section (Initially Hidden) -->
-                <div class="comments-section" id="comments-section">
-                    <div class="comments-header">
-                        <div class="comments-title">Comments (348)</div>
-                        <div class="comments-close"><i class="fas fa-times"></i></div>
-                    </div>
-                    
-                    <!-- Nigerian Comments -->
-                    <div class="comment">
-                        <div class="comment-avatar">
-                            <img src="ayo.jpeg" alt="Commenter">
-                        </div>
-                        <div class="comment-content">
-                            <div class="comment-header">
-                                <span class="comment-username">AyoThegreat</span>
-                                <span class="comment-time">30 mins ago</span>
-                            </div>
-                            <div class="comment-text">Omo, this movie make sense die! Kunle Afolayan really surprise me for this film. 🔥🔥🔥</div>
-                        </div>
-                    </div>
-                    
-                    <div class="comment">
-                        <div class="comment-avatar">
-                            <img src="chidnma.jpeg" alt="Commenter">
-                        </div>
-                        <div class="comment-content">
-                            <div class="comment-header">
-                                <span class="comment-username">ChidinmaB</span>
-                                <span class="comment-time">45 mins ago</span>
-                            </div>
-                            <div class="comment-text">Chai! The plot twist for this one na correct weyrey thing. I no fit wait for part 2 abeg 🙌</div>
-                        </div>
-                    </div>
-                    
-                    <div class="comment">
-                        <div class="comment-avatar">
-                            <img src="edo.jpeg" alt="Commenter">
-                        </div>
-                        <div class="comment-content">
-                            <div class="comment-header">
-                                <span class="comment-username">Nosa</span>
-                                <span class="comment-time">1 hour ago</span>
-                            </div>
-                            <div class="comment-text">Nollywood don finally reach another level. See cinematography! See acting! Naija to the world 🇳🇬</div>
-                        </div>
-                    </div>
-                    
-                    <div class="comment">
-                        <div class="comment-avatar">
-                            <img src="run.jpeg" alt="Commenter">
-                        </div>
-                        <div class="comment-content">
-                            <div class="comment-header">
-                                <span class="comment-username">Yusuf_Rufai</span>
-                                <span class="comment-time">1 hour ago</span>
-                            </div>
-                            <div class="comment-text">Who else notice say the soundtrack dey gbeff well well? I don download am already! 😂</div>
-                        </div>
-                    </div>
-                    
-                    <div class="comment">
-                        <div class="comment-avatar">
-                            <img src="cat.jpeg" alt="Commenter">
-                        </div>
-                        <div class="comment-content">
-                            <div class="comment-header">
-                                <span class="comment-username">BigDaddy042</span>
-                                <span class="comment-time">2 hours ago</span>
-                            </div>
-                            <div class="comment-text">I don watch am 3 times already. E too sweet! Make una no miss this one o. Part 2 go mad pass this one self 👏</div>
-                        </div>
-                    </div>
-                    
-                    <!-- Comment Input -->
-                    <div class="comment-input-container">
-                        <input type="text" class="comment-input" placeholder="Add a comment..." id="comment-input">
-                        <button class="comment-submit" id="comment-submit" disabled>Post</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Image Post (Jane Cosmos) -->
-            <div class="post">
-                <div class="post-header">
-                    <div class="post-user-pic">
-                        <img src="wife.jpeg" alt="User Profile">
-                    </div>
-                    <div class="post-user-info">
-                        <div class="post-username">Jane Cosmos</div>
-                        <div class="post-time">5 hours ago</div>
-                    </div>
-                </div>
-                <div class="post-content">
-                    <img class="post-media" src="girl.jpeg" alt="Post Image">
-                </div>
-                <div class="post-actions">
-                    <div class="post-actions-left">
-                        <div class="action-button like-button">
-                            <i class="far fa-heart"></i>
-                            <span class="action-count">847</span>
-                            <span class="like-info">(N847 Nubis)</span>
-                            <div class="like-tooltip">Costs N1 to like this post</div>
-                        </div>
-                        <div class="action-button">
-                            <i class="far fa-comment"></i>
-                            <span class="action-count">124</span>
-                        </div>
-                        <div class="action-button">
-                            <i class="far fa-share-square"></i>
-                            <span class="action-count">32</span>
-                        </div>
-                    </div>
-                    <div class="action-button">
-                        <i class="far fa-bookmark"></i>
-                    </div>
-                </div>
-                <div class="post-caption">
-                    <div class="caption-text">
-                        Had an amazing time in Lagos Nigeria. Took this shot of Jumoke the bread seller.
-                    </div>
-                    <div class="hashtags">#TravelGoals #Lagos #ExploreMore</div>
-                </div>
-            </div>
-
-            <!-- Image Post (Emeka_That_Igbo_Boy) -->
-            <div class="post">
-                <div class="post-header">
-                    <div class="post-user-pic">
-                        <img src="emeku.jpeg" alt="User Profile">
-                    </div>
-                    <div class="post-user-info">
-                        <div class="post-username">Emeka_That_Igbo_Boy</div>
-                        <div class="post-time">5 hours ago</div>
-                    </div>
-                </div>
-                <div class="post-content">
-                    <img class="post-media" src="nysc.jpeg" alt="Post Image">
-                </div>
-                <div class="post-actions">
-                    <div class="post-actions-left">
-                        <div class="action-button like-button">
-                            <i class="far fa-heart"></i>
-                            <span class="action-count">1.5k</span>
-                            <span class="like-info">(N1.5k Nubis)</span>
-                            <div class="like-tooltip">Costs N1 to like this post</div>
-                        </div>
-                        <div class="action-button">
-                            <i class="far fa-comment"></i>
-                            <span class="action-count">124</span>
-                        </div>
-                        <div class="action-button">
-                            <i class="far fa-share-square"></i>
-                            <span class="action-count">32</span>
-                        </div>
-                    </div>
-                    <div class="action-button">
-                        <i class="far fa-bookmark"></i>
-                    </div>
-                </div>
-                <div class="post-caption">
-                    <div class="caption-text">
-                        omo see wetin NYSC make person dey do. Tinubu help us oooooooo
-                    </div>
-                    <div class="hashtags">#33k #Kano #HoldYourRansom</div>
-                </div>
-            </div>
+    <!-- Dark mode toggle -->
+    <button class="dark-mode-toggle" aria-label="Toggle dark mode" onclick="toggleDarkMode()">
+        <i class="fas fa-moon"></i>
+    </button>
+    
+    <!-- Video Modal -->
+    <div class="modal" id="video-modal">
+        <div class="modal-content">
+            <button class="close-modal" aria-label="Close video">&times;</button>
+            <video id="video-player" controls>
+                <source src="https://samplelib.com/lib/preview/mp4/sample-5s.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
         </div>
-
-        <div class="bottom-nav">
-            <div class="menu-button">
-                <i class="fas fa-bars"></i>
+    </div>
+    
+    <!-- Payment Confirmation -->
+    <div class="payment-confirmation" id="payment-confirmation">
+        <i class="fas fa-check-circle"></i>
+        <span>N1 sent to @username</span>
+    </div>
+    
+    <!-- Insufficient Funds Modal -->
+    <div class="insufficient-funds" id="insufficient-funds">
+        <div class="funds-modal-content">
+            <div class="funds-modal-title">Insufficient Funds</div>
+            <div class="funds-modal-text">
+                You don't have enough balance to react to this post. Each reaction costs N1. Please add funds to your wallet to continue engaging.
             </div>
-            <div class="message-button-container">
-                <div class="message-button">
-                    <i class="fas fa-comment-dots"></i>
-                </div>
-                <span class="message-badge">3</span>
+            <div>
+                <button class="modal-button add-funds-button" onclick="showAddFundsModal()">Add Funds</button>
+                <button class="modal-button cancel-button" onclick="closeFundsModal()">Cancel</button>
             </div>
         </div>
     </div>
 
-    <!-- Wallet Transfer Modal -->
-    <div class="modal-overlay" id="wallet-modal">
-        <div class="modal">
-            <div class="modal-header">
-                <div>Transfer Nubis to Bank</div>
-                <div class="modal-close" id="wallet-modal-close">×</div>
+    <!-- Add Funds Modal -->
+    <div class="add-funds-modal" id="add-funds-modal">
+        <div class="funds-modal-content">
+            <div class="funds-modal-title">Add Funds to Wallet</div>
+            <div class="funds-modal-text">
+                Select an amount to add to your wallet. All transactions are secure.
             </div>
-            <div class="modal-body">
-                <div class="bank-info">
-                    <div class="bank-info-title">Your Wallet Balance</div>
-                    <div>Available: <strong>N120,000</strong></div>
+            <div class="funds-options">
+                <div class="fund-option" tabindex="0" onclick="selectFundOption(this)" data-amount="1000">
+                    <div class="fund-amount">N1,000</div>
+                    <div class="fund-bonus">No bonus</div>
                 </div>
-                <form id="transfer-form">
-                    <div class="form-group">
-                        <label class="form-label" for="bank-name">Bank Name</label>
-                        <select class="form-input" id="bank-name" required>
-                            <option value="">Select Bank</option>
-                            <option value="gtb">GTBank</option>
-                            <option value="access">Access Bank</option>
-                            <option value="first">First Bank</option>
-                            <option value="zenith">Zenith Bank</option>
-                            <option value="uba">UBA</option>
-                            <option value="kuda">Kuda Bank</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="account-number">Account Number</label>
-                        <input type="text" class="form-input" id="account-number" pattern="[0-9]{10}" placeholder="10-digit account number" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="transfer-amount">Amount (Naira)</label>
-                        <input type="number" class="form-input" id="transfer-amount" min="1000" max="100000" placeholder="Minimum: N1,000" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="transfer-reason">Reason (Optional)</label>
-                        <input type="text" class="form-input" id="transfer-reason" placeholder="e.g. Savings, Family support, etc.">
-                    </div>
-                    <button type="submit" class="form-button">Transfer Now</button>
-                </form>
+                <div class="fund-option" tabindex="0" onclick="selectFundOption(this)" data-amount="5000">
+                    <div class="fund-amount">N5,000</div>
+                    <div class="fund-bonus">+N200 bonus</div>
+                </div>
+                <div class="fund-option" tabindex="0" onclick="selectFundOption(this)" data-amount="10000">
+                    <div class="fund-amount">N10,000</div>
+                    <div class="fund-bonus">+N500 bonus</div>
+                </div>
+                <div class="fund-option" tabindex="0" onclick="selectFundOption(this)" data-amount="20000">
+                    <div class="fund-amount">N20,000</div>
+                    <div class="fund-bonus">+N1,200 bonus</div>
+                </div>
+            </div>
+            <div>
+                <button class="modal-button add-funds-button" onclick="processPayment()">Continue to Payment</button>
+                <button class="modal-button cancel-button" onclick="closeAddFundsModal()">Cancel</button>
             </div>
         </div>
     </div>
 
+    <!-- Transactions History -->
+    <div class="transactions-container" id="transactions-container">
+        <div class="transactions-header">
+            <div class="transactions-title">Transaction History</div>
+            <button class="close-transactions" onclick="closeTransactions()">&times;</button>
+        </div>
+        <div class="transactions-list" id="transactions-list">
+            <!-- Transactions will be loaded here -->
+        </div>
+    </div>
+    
     <script>
-        // Simple interaction for the prototype
-        document.addEventListener('DOMContentLoaded', function() {
-            // Toggle heart icon on click
-            const likeButtons = document.querySelectorAll('.like-button');
-            likeButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const heartIcon = this.querySelector('i');
-                    heartIcon.classList.toggle('far');
-                    heartIcon.classList.toggle('fas');
-                    
-                    if (heartIcon.classList.contains('fas')) {
-                        heartIcon.style.color = '#FF3B30';
-                    } else {
-                        heartIcon.style.color = '';
-                    }
-                    
-                    // Update count for demo purposes
-                    const countElement = this.querySelector('.action-count');
-                    let count = parseInt(countElement.textContent.replace(/,/g, ''));
-                    if (heartIcon.classList.contains('fas')) {
-                        count += 1;
-                    } else {
-                        count -= 1;
-                    }
-                    
-                    // Format count
-                    let formattedCount;
-                    if (count >= 1000) {
-                        formattedCount = (count / 1000).toFixed(1) + 'k';
-                    } else {
-                        formattedCount = count.toString();
-                    }
-                    
-                    countElement.textContent = formattedCount;
-                    
-                    // Update earning info
-                    const earningElement = this.querySelector('.like-info');
-                    earningElement.textContent = `(N${formattedCount} Nubis)`;
-                    
-                    // Show a balance update alert for demo
-                    if (heartIcon.classList.contains('fas')) {
-                        setTimeout(() => {
-                            // In a real app, this would update the balance display
-                            alert('N1 deducted from your balance for this like');
-                        }, 500);
-                    }
-                });
-                
-                // Show tooltip on hover
-                button.addEventListener('mouseenter', function() {
-                    const tooltip = this.querySelector('.like-tooltip');
-                    tooltip.style.display = 'block';
-                });
-                
-                button.addEventListener('mouseleave', function() {
-                    const tooltip = this.querySelector('.like-tooltip');
-                    tooltip.style.display = 'none';
-                });
-            });
-
-            // Toggle bookmark icon on click
-            const bookmarkButtons = document.querySelectorAll('.fa-bookmark');
-            bookmarkButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    this.classList.toggle('far');
-                    this.classList.toggle('fas');
-                    
-                    if (this.classList.contains('fas')) {
-                        this.style.color = '#1877F2';
-                    } else {
-                        this.style.color = '';
-                    }
-                });
-            });
-
-            // Video play simulation
-            const videoOverlays = document.querySelectorAll('.video-overlay');
-            videoOverlays.forEach(overlay => {
-                overlay.addEventListener('click', function() {
-                    this.style.backgroundColor = 'rgba(0, 0, 0, 0)';
-                    const playButton = this.querySelector('.play-button');
-                    playButton.style.display = 'none';
-                    // In a real app, this would play the video
-                    alert('Video would play here in the full app');
-                });
-            });
-
-            // Menu button
-            const menuButton = document.querySelector('.menu-button');
-            menuButton.addEventListener('click', function() {
-                alert('Settings menu would open here');
-            });
-            
-            // Message button
-            const messageButton = document.querySelector('.message-button');
-            messageButton.addEventListener('click', function() {
-                alert('Messages would open here (3 unread)');
-            });
-
-            // Wallet button functionality
-            const walletButton = document.getElementById('wallet-button');
-            const walletModal = document.getElementById('wallet-modal');
-            const walletModalClose = document.getElementById('wallet-modal-close');
-
-            walletButton.addEventListener('click', function() {
-                walletModal.style.display = 'flex';
-                document.body.style.overflow = 'hidden';
-            });
-
-            walletModalClose.addEventListener('click', function() {
-                walletModal.style.display = 'none';
-                document.body.style.overflow = 'auto';
-            });
-
-            // Close modal when clicking outside
-            walletModal.addEventListener('click', function(e) {
-                if (e.target === walletModal) {
-                    walletModal.style.display = 'none';
-                    document.body.style.overflow = 'auto';
+        // App state
+        const state = {
+            userBalance: 120450, // N120,450 in kobo to avoid floating point issues
+            darkMode: localStorage.getItem('darkMode') === 'true',
+            posts: [],
+            transactions: [
+                {
+                    id: 1,
+                    amount: 1000,
+                    type: 'debit',
+                    description: 'Reaction to @travel_addict post',
+                    time: '2 hours ago'
+                },
+                {
+                    id: 2,
+                    amount: 5000,
+                    type: 'credit',
+                    description: 'Wallet top-up',
+                    time: '5 hours ago'
+                },
+                {
+                    id: 3,
+                    amount: 1000,
+                    type: 'debit',
+                    description: 'Reaction to @tech_reviewer post',
+                    time: '1 day ago'
+                },
+                {
+                    id: 4,
+                    amount: 20000,
+                    type: 'credit',
+                    description: 'Wallet top-up',
+                    time: '2 days ago'
                 }
-            });
+            ],
+            selectedFundAmount: 0
+        };
 
-            // Handle transfer form submission
-            const transferForm = document.getElementById('transfer-form');
-            transferForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                const bankName = document.getElementById('bank-name').value;
-                const accountNumber = document.getElementById('account-number').value;
-                const amount = document.getElementById('transfer-amount').value;
-                
-                alert(`Transfer of N${amount} to account ${accountNumber} initiated successfully! Check your email for confirmation.`);
-                
-                // Update balance for demo purposes
-                const currentBalance = document.getElementById('balance-amount');
-                const newBalance = parseInt(120000) - parseInt(amount);
-                currentBalance.textContent = `N${(newBalance / 1000).toFixed(1)}k`;
-                
-                walletModal.style.display = 'none';
-                document.body.style.overflow = 'auto';
-                
-                // Reset form
-                transferForm.reset();
-            });
+        // Initialize app
+        function initApp() {
+            // Set dark mode if enabled
+            if (state.darkMode) {
+                document.body.classList.add('dark-mode');
+                document.querySelector('.dark-mode-toggle i').classList.replace('fa-moon', 'fa-sun');
+            }
 
-            // Comments section functionality
-            const commentButton = document.querySelector('.comment-button');
-            const commentsSection = document.getElementById('comments-section');
-            const commentsClose = document.querySelector('.comments-close');
-            
-            commentButton.addEventListener('click', function() {
-                commentsSection.style.display = commentsSection.style.display === 'block' ? 'none' : 'block';
-                commentsSection.scrollIntoView({ behavior: 'smooth' });
-            });
-            
-            commentsClose.addEventListener('click', function() {
-                commentsSection.style.display = 'none';
-            });
-            
-            // Comment input functionality
-            const commentInput = document.getElementById('comment-input');
-            const commentSubmit = document.getElementById('comment-submit');
-            
-            commentInput.addEventListener('input', function() {
-                // Enable/disable submit button based on input
-                commentSubmit.disabled = this.value.trim() === '';
-            });
-            
-            commentSubmit.addEventListener('click', function() {
-                const commentText = commentInput.value.trim();
-                if (commentText) {
-                    // Create new comment element
-                    const newComment = document.createElement('div');
-                    newComment.className = 'comment';
-                    
-                    // Get current time for comment
-                    const now = new Date();
-                    const timeString = 'Just now';
-                    
-                    newComment.innerHTML = `
-                        <div class="comment-avatar">
-                            <img src="profile.jpeg" alt="Your Avatar">
-                        </div>
-                        <div class="comment-content">
-                            <div class="comment-header">
-                                <span class="comment-username">You</span>
-                                <span class="comment-time">${timeString}</span>
-                            </div>
-                            <div class="comment-text">${commentText}</div>
+            // Load sample posts
+            loadPosts();
+
+            // Update balance display
+            updateBalanceDisplay();
+
+            // Load transactions
+            renderTransactions();
+
+            // Simulate loading
+            showLoading();
+            setTimeout(hideLoading, 1500);
+        }
+
+        // Load sample posts
+        function loadPosts() {
+            state.posts = [
+                {
+                    id: 1,
+                    username: 'travel_addict',
+                    userPic: 'https://randomuser.me/api/portraits/women/44.jpg',
+                    time: '2 hrs ago • Lagos',
+                    earnings: 1240,
+                    media: {
+                        type: 'image',
+                        url: 'https://source.unsplash.com/random/600x600/?nature,mountain'
+                    },
+                    likes: 1240,
+                    comments: 84,
+                    caption: 'Sunrise views from my hike this morning! 🏔️ Each like puts N1 in my wallet. #NatureLover #EarnWithREACTR',
+                    liked: false
+                },
+                {
+                    id: 2,
+                    username: 'tech_reviewer',
+                    userPic: 'https://randomuser.me/api/portraits/men/22.jpg',
+                    time: '5 hrs ago • Abuja',
+                    earnings: 3587,
+                    media: {
+                        type: 'video',
+                        thumbnail: 'https://source.unsplash.com/random/600x600/?tech,phone',
+                        url: 'https://samplelib.com/lib/preview/mp4/sample-5s.mp4'
+                    },
+                    likes: 3587,
+                    comments: 214,
+                    caption: 'Unboxing the new REACTR Phone 14 Pro Max! The camera improvements are insane. Remember - each like sends N1 to my wallet! #Tech #EarnWithREACTR',
+                    liked: false
+                },
+                {
+                    id: 3,
+                    username: 'foodie_king',
+                    userPic: 'https://randomuser.me/api/portraits/men/32.jpg',
+                    time: '8 hrs ago • Port Harcourt',
+                    earnings: 875,
+                    media: {
+                        type: 'image',
+                        url: 'https://source.unsplash.com/random/600x600/?food'
+                    },
+                    likes: 875,
+                    comments: 42,
+                    caption: 'Homemade jollof rice that will make your taste buds dance! 💃 Each like = N1 for me. #JollofWars #EarnWithREACTR',
+                    liked: false
+                }
+            ];
+
+            renderPosts();
+        }
+
+        // Render posts to the feed
+        function renderPosts() {
+            const feed = document.getElementById('feed');
+            feed.innerHTML = '';
+
+            state.posts.forEach(post => {
+                const postElement = document.createElement('div');
+                postElement.className = 'post';
+                postElement.setAttribute('data-post-id', post.id);
+
+                let mediaHtml = '';
+                if (post.media.type === 'image') {
+                    mediaHtml = `
+                        <img src="girl.jpeg" alt="Post by ${post.username}" class="post-image" loading="lazy">
+                    `;
+                } else if (post.media.type === 'video') {
+                    mediaHtml = `
+                        <div class="video-container">
+                            <img src="wert.png" alt="Video thumbnail by ${post.username}" class="video-thumbnail" loading="lazy">
+                            <button class="play-button" aria-label="Play video" onclick="openVideoModal('${post.media.url}')">
+                                <i class="fas fa-play play-icon"></i>
+                            </button>
                         </div>
                     `;
-                    
-                    // Add new comment to the top of comments section
-                    const firstComment = document.querySelector('.comment');
-                    const commentsContainer = firstComment.parentNode;
-                    commentsContainer.insertBefore(newComment, firstComment);
-                    
-                    // Update comment count
-                    const countElement = commentButton.querySelector('.action-count');
-                    let count = parseInt(countElement.textContent) + 1;
-                    countElement.textContent = count;
-                    
-                    // Update comments title
-                    document.querySelector('.comments-title').textContent = `Comments (${count})`;
-                    
-                    // Clear input
-                    commentInput.value = '';
-                    commentSubmit.disabled = true;
+                }
+
+                const likeIconClass = post.liked ? 'fas fa-heart action-icon like active' : 'far fa-heart action-icon like';
+
+                postElement.innerHTML = `
+                    <div class="post-header">
+                        <img src="edo.jpeg" alt="${post.username}" class="post-user-pic">
+                        <div class="post-user-info">
+                            <div class="post-username">${post.username}</div>
+                            <div class="post-time">${post.time}</div>
+                        </div>
+                        <div class="post-earnings">N${post.earnings.toLocaleString()} earned</div>
+                    </div>
+                    <div class="post-media">
+                        ${mediaHtml}
+                    </div>
+                    <div class="post-actions">
+                        <div class="action-icon-container">
+                            <button class="${likeIconClass}" onclick="likePost(this)" aria-label="Like post"></button>
+                            <span class="action-cost">N1</span>
+                        </div>
+                        <div class="action-icon-container">
+                            <button class="far fa-comment action-icon comment" aria-label="Comment on post"></button>
+                            <span class="action-value">${post.comments}</span>
+                        </div>
+                    </div>
+                    <div class="post-stats">
+                        <div class="post-likes">
+                            <i class="fas fa-heart" style="color: var(--accent-red);"></i>
+                            <span class="likes-count">${post.likes.toLocaleString()} reactions</span>
+                        </div>
+                        <div class="post-earned">
+                            <i class="fas fa-coins" style="color: gold;"></i>
+                            N${post.earnings.toLocaleString()} earned from this post
+                        </div>
+                        <div class="post-caption">
+                            <span class="post-caption-username">${post.username}</span>
+                            ${post.caption}
+                        </div>
+                        <div class="post-comments">View all ${post.comments} comments</div>
+                    </div>
+                `;
+
+                feed.appendChild(postElement);
+            });
+        }
+
+        // Render transactions
+        function renderTransactions() {
+            const transactionsList = document.getElementById('transactions-list');
+            transactionsList.innerHTML = '';
+
+            // Sort transactions by time (newest first)
+            const sortedTransactions = [...state.transactions].sort((a, b) => b.id - a.id);
+
+            sortedTransactions.forEach(transaction => {
+                const transactionElement = document.createElement('div');
+                transactionElement.className = 'transaction-item';
+
+                const amountClass = transaction.type === 'credit' ? 'transaction-amount positive' : 'transaction-amount negative';
+                const amountSign = transaction.type === 'credit' ? '+' : '-';
+
+                transactionElement.innerHTML = `
+                    <div class="transaction-details">
+                        <div class="${amountClass}">${amountSign}N${(transaction.amount / 1000).toLocaleString()}k</div>
+                        <div class="transaction-description">${transaction.description}</div>
+                    </div>
+                    <div class="transaction-time">${transaction.time}</div>
+                `;
+
+                transactionsList.appendChild(transactionElement);
+            });
+        }
+
+        // Update balance display
+        function updateBalanceDisplay() {
+            document.getElementById('user-balance').textContent = 
+                'N' + (state.userBalance / 1000).toLocaleString() + 'k';
+        }
+
+        // Video Modal functionality
+        function openVideoModal(videoUrl = 'https://samplelib.com/lib/preview/mp4/sample-5s.mp4') {
+            const modal = document.getElementById('video-modal');
+            const video = document.getElementById('video-player');
+            
+            video.src = videoUrl;
+            modal.style.display = 'flex';
+            video.play();
+            
+            // Pause video when modal is closed
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeVideoModal();
                 }
             });
+        }
+        
+        function closeVideoModal() {
+            const modal = document.getElementById('video-modal');
+            const video = document.getElementById('video-player');
+            
+            modal.style.display = 'none';
+            video.pause();
+            video.currentTime = 0;
+        }
+
+        // Like button functionality with payment system
+        function likePost(icon) {
+            const postElement = icon.closest('.post');
+            const postId = parseInt(postElement.getAttribute('data-post-id'));
+            const post = state.posts.find(p => p.id === postId);
+            
+            if (post.liked) {
+                // Unlike post
+                icon.classList.remove('fas');
+                icon.classList.add('far');
+                post.liked = false;
+                return;
+            }
+            
+            // Check if user has sufficient funds
+            if (state.userBalance < 1000) { // N1 = 1000 in our kobo system
+                document.getElementById('insufficient-funds').style.display = 'flex';
+                return;
+            }
+            
+            // Deduct N1 from user's balance
+            state.userBalance -= 1000;
+            updateBalanceDisplay();
+            
+            // Add transaction
+            state.transactions.unshift({
+                id: state.transactions.length + 1,
+                amount: 1000,
+                type: 'debit',
+                description: `Reaction to @${post.username} post`,
+                time: 'Just now'
+            });
+            renderTransactions();
+            
+            // Create coin animation
+            const anim = document.createElement('div');
+            anim.className = 'coin-animation';
+            anim.innerHTML = '<i class="fas fa-coins"></i>';
+            anim.style.left = (icon.getBoundingClientRect().left + icon.offsetWidth/2 - 12) + 'px';
+            anim.style.top = (icon.getBoundingClientRect().top - 10) + 'px';
+            document.body.appendChild(anim);
+            
+            // Remove animation element after it's done
+            setTimeout(() => {
+                anim.remove();
+            }, 800);
+            
+            // Update post stats
+            post.likes += 1;
+            post.earnings += 1;
+            post.liked = true;
+            
+            // Update like count
+            const likesCount = postElement.querySelector('.likes-count');
+            likesCount.textContent = post.likes.toLocaleString();
+            
+            // Update earnings display
+            const earnedText = postElement.querySelector('.post-earned');
+            earnedText.textContent = 'N' + post.earnings.toLocaleString() + ' earned from this post';
+            
+            // Update post earnings badge
+            const earningsBadge = postElement.querySelector('.post-earnings');
+            earningsBadge.textContent = 'N' + post.earnings.toLocaleString() + ' earned';
+            
+            // Show payment confirmation
+            const confirmation = document.getElementById('payment-confirmation');
+            confirmation.querySelector('span').textContent = 'N1 sent to @' + post.username;
+            confirmation.style.display = 'flex';
+            
+            setTimeout(() => {
+                confirmation.style.display = 'none';
+            }, 3000);
+            
+            // Toggle like state
+            icon.classList.remove('far');
+            icon.classList.add('fas');
+        }
+        
+        // Funds modal functions
+        function closeFundsModal() {
+            document.getElementById('insufficient-funds').style.display = 'none';
+        }
+        
+        function showAddFundsModal() {
+            document.getElementById('add-funds-modal').style.display = 'flex';
+            closeFundsModal();
+        }
+        
+        function closeAddFundsModal() {
+            document.getElementById('add-funds-modal').style.display = 'none';
+            // Reset selection
+            document.querySelectorAll('.fund-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            state.selectedFundAmount = 0;
+        }
+        
+        function selectFundOption(element) {
+            document.querySelectorAll('.fund-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            state.selectedFundAmount = parseInt(element.getAttribute('data-amount'));
+        }
+        
+        function processPayment() {
+            if (state.selectedFundAmount === 0) {
+                alert('Please select an amount to add');
+                return;
+            }
+            
+            showLoading();
+            
+            // Simulate payment processing
+            setTimeout(() => {
+                hideLoading();
+                
+                // Add bonus for larger amounts
+                let bonus = 0;
+                if (state.selectedFundAmount >= 5000 && state.selectedFundAmount < 10000) {
+                    bonus = 20000; // N200
+                } else if (state.selectedFundAmount >= 10000 && state.selectedFundAmount < 20000) {
+                    bonus = 50000; // N500
+                } else if (state.selectedFundAmount >= 20000) {
+                    bonus = 120000; // N1,200
+                }
+                
+                const totalAdded = state.selectedFundAmount * 1000 + bonus;
+                state.userBalance += totalAdded;
+                updateBalanceDisplay();
+                
+                // Add transaction
+                state.transactions.unshift({
+                    id: state.transactions.length + 1,
+                    amount: totalAdded,
+                    type: 'credit',
+                    description: 'Wallet top-up',
+                    time: 'Just now'
+                });
+                renderTransactions();
+                
+                closeAddFundsModal();
+                
+                // Show success message
+                const confirmation = document.getElementById('payment-confirmation');
+                confirmation.querySelector('span').textContent = 
+                    `N${(totalAdded / 1000).toLocaleString()} added to your wallet${bonus > 0 ? ' (+N' + (bonus / 1000) + ' bonus)' : ''}`;
+                confirmation.style.display = 'flex';
+                
+                setTimeout(() => {
+                    confirmation.style.display = 'none';
+                }, 3000);
+            }, 2000);
+        }
+
+        // Transactions functions
+        function showTransactions() {
+            document.getElementById('transactions-container').style.display = 'flex';
+        }
+        
+        function closeTransactions() {
+            document.getElementById('transactions-container').style.display = 'none';
+        }
+
+        // Dark mode toggle
+        function toggleDarkMode() {
+            state.darkMode = !state.darkMode;
+            document.body.classList.toggle('dark-mode');
+            
+            const icon = document.querySelector('.dark-mode-toggle i');
+            if (state.darkMode) {
+                icon.classList.replace('fa-moon', 'fa-sun');
+            } else {
+                icon.classList.replace('fa-sun', 'fa-moon');
+            }
+            
+            // Save preference to localStorage
+            localStorage.setItem('darkMode', state.darkMode);
+        }
+
+        // Loading functions
+        function showLoading() {
+            document.querySelector('.loading-overlay').style.display = 'flex';
+        }
+        
+        function hideLoading() {
+            document.querySelector('.loading-overlay').style.display = 'none';
+        }
+
+        // Menu toggle (placeholder)
+        function toggleMenu() {
+            alert('Menu functionality would go here in a full implementation');
+        }
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initApp);
+
+        // Close modals when clicking outside
+        document.addEventListener('click', function(event) {
+            const addFundsModal = document.getElementById('add-funds-modal');
+            if (addFundsModal.style.display === 'flex' && !event.target.closest('.funds-modal-content')) {
+                closeAddFundsModal();
+            }
+            
+            const insufficientFundsModal = document.getElementById('insufficient-funds');
+            if (insufficientFundsModal.style.display === 'flex' && !event.target.closest('.funds-modal-content')) {
+                closeFundsModal();
+            }
+        });
+
+        // Keyboard accessibility
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeAddFundsModal();
+                closeFundsModal();
+                closeVideoModal();
+                closeTransactions();
+            }
         });
     </script>
 </body>
